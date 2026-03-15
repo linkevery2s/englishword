@@ -49,6 +49,11 @@ class="bg-gray-800 text-white px-4 py-2 rounded mb-4">
 <img id="image"
 class="rounded-lg max-h-72 mb-4 object-contain hidden">
 
+<button id="googleImage"
+class="bg-blue-600 text-white px-3 py-1 rounded mt-2">
+🖼 Google Images
+</button>
+
 <p class="text-gray-500 text-sm">Example</p>
 <p id="example" class="mb-2"></p>
 
@@ -237,6 +242,18 @@ document.getElementById("youglish").onclick = () => {
             + "/english"
 
  window.open(url, "_blank")
+
+}
+
+document.getElementById("googleImage").onclick = () => {
+
+ const word = words[index].word
+
+ const url =
+ "https://www.google.com/search?tbm=isch&q=" +
+ encodeURIComponent(word)
+
+ window.open(url,"_blank")
 
 }
 
