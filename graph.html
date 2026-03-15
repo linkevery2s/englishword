@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>English Study Dashboard</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+<!-- header -->
+<header class="bg-blue-600 text-white p-4 text-center text-xl font-bold">
+English Study Dashboard
+</header>
+
+<!-- dashboard -->
+<div class="max-w-6xl mx-auto p-6 grid gap-6 md:grid-cols-2">
+
+<!-- total time -->
+<div class="bg-white rounded-xl shadow p-6 text-center">
+
+<h2 class="text-lg font-bold mb-2">
+Total Study Time
+</h2>
+
+<p id="totalTime" class="text-4xl font-bold text-blue-600">
+0 min
+</p>
+
+</div>
+
+<!-- pie chart -->
+<div class="bg-white rounded-xl shadow p-6">
+
+<h2 class="text-lg font-bold mb-4 text-center">
+Study Ratio
+</h2>
+
+<canvas id="pieChart"></canvas>
+
+</div>
+
+<!-- study list -->
+<div class="bg-white rounded-xl shadow p-6 md:col-span-2">
+
+<h2 class="text-lg font-bold mb-4">
+Study Details
+</h2>
+
+<ul id="studyList" class="space-y-2 text-gray-700"></ul>
+
+</div>
+
+</div>
+
+<script>
+
+async function loadData(){
+
+const res = await fetch("study-data.json")
+const json = await res.json()
+
+const labels = json.skills.map(s => s.name)
+const values = json.skills.map(s => s.time)
+
+const total = values.reduce((a,b)=>a+b,0)
+
+document.getElementById("totalTime").innerText = total + " min"
+
+createPieChart(labels,values)
+createList(labels,values)
+
+}
+
+function createPieChart(labels,data){
+
+new Chart(
+document.getElementById("pieChart"),
+{
+type:"pie",
+
+data:{
+labels:labels,
+datasets:[
+{
+data:data,
+backgroundColor:[
+"#3b82f6",
+"#10b981",
+"#f59e0b",
+"#ef4444",
+"#8b5cf6",
+"#14b8a6"
+]
+}
+]
+},
+
+options:{
+responsive:true,
+plugins:{
+legend:{
+position:"bottom"
+}
+}
+}
+
+})
+
+}
+
+function createList(labels,data){
+
+const ul = document.getElementById("studyList")
+
+labels.forEach((label,i)=>{
+
+const li = document.createElement("li")
+
+li.className="flex justify-between border-b pb-1"
+
+li.innerHTML = `
+<span>${label}</span>
+<span>${data[i]} min</span>
+`
+
+ul.appendChild(li)
+
+})
+
+}
+
+loadData()
+
+</script>
+
+</body>
+</html>
