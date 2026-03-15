@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+
+<meta charset="UTF-8">
+<title>English Word Trainer</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-gray-100">
+
+<div class="max-w-3xl mx-auto p-6">
+
+<h1 class="text-2xl font-bold mb-6">
+English Word Trainer
+</h1>
+
+<!-- 問題カード -->
+
+<div class="bg-white p-6 rounded-xl shadow">
+
+<h2 class="text-sm text-gray-500 mb-1">Word</h2>
+
+<p id="word" class="text-3xl font-bold mb-4"></p>
+
+<button id="speakWord"
+class="bg-gray-800 text-white px-4 py-2 rounded mb-4">
+🔊 単語音声
+</button>
+
+</div>
+
+<!-- 答え -->
+
+<details class="bg-white p-6 rounded-xl shadow mt-4">
+
+<summary class="cursor-pointer text-blue-600 text-lg">
+答えを見る
+</summary>
+
+<div class="mt-4">
+
+<p class="text-gray-500 text-sm">Meaning</p>
+<p id="meaning" class="text-xl mb-4"></p>
+
+<img id="image"
+class="rounded-lg max-h-72 mb-4 object-contain hidden">
+
+<p class="text-gray-500 text-sm">Example</p>
+<p id="example" class="mb-2"></p>
+
+<button id="speakExample"
+class="bg-gray-700 text-white px-3 py-1 rounded mb-3">
+🔊 例文音声
+</button>
+
+<p class="text-gray-500 text-sm">Example Meaning</p>
+<p id="exampleMeaning" class="mb-3"></p>
+
+<p class="text-gray-500 text-sm">Synonym</p>
+<p id="synonym"></p>
+
+</div>
+
+</details>
+
+<!-- 操作 -->
+
+<div class="flex gap-4 mt-6">
+
+<button id="know"
+class="flex-1 bg-green-500 text-white p-3 rounded-lg">
+覚えた
+</button>
+
+<button id="dontknow"
+class="flex-1 bg-red-500 text-white p-3 rounded-lg">
+まだ
+</button>
+
+</div>
+
+<div class="flex gap-4 mt-3">
+
+<button id="next"
+class="flex-1 bg-blue-600 text-white p-3 rounded-lg">
+次の単語
+</button>
+
+<button id="review"
+class="flex-1 bg-purple-600 text-white p-3 rounded-lg">
+復習モード
+</button>
+
+</div>
+
+<!-- 学習状況 -->
+
+<div class="bg-white p-6 rounded-xl shadow mt-6">
+
+<h2 class="font-bold mb-3">学習状況</h2>
+
+<div class="grid grid-cols-3 text-center">
+
+<div>
+<p class="text-gray-500 text-sm">回答数</p>
+<p id="total" class="text-2xl font-bold">0</p>
+</div>
+
+<div>
+<p class="text-gray-500 text-sm">正答数</p>
+<p id="correct" class="text-2xl font-bold">0</p>
+</div>
+
+<div>
+<p class="text-gray-500 text-sm">正答率</p>
+<p id="rate" class="text-2xl font-bold">0%</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let words=[]
+let reviewList=[]
+let index=0
+
+let total=0
+let correct=0
+
+async function loadCSV(){
+
+ const res=await fetch("data2.csv")
+ const text=await res.text()
+
+ words=parseCSV(text)
+
+ loadStats()
+ loadReview()
+
+ showWord()
+
+}
+
+function parseCSV(text){
+
+ const lines=text.trim().split("\n")
+ const result=[]
+
+ lines.shift()
+
+ lines.forEach(line=>{
+
+   line=line.replace(/^"|"$/g,"")
+
+   const parts=line.split('","')
+
+   result.push({
+
+     word:parts[0].replace(/""/g,'"'),
+     image:parts[1],
+     meaning:parts[2],
+     example:parts[3],
+     exampleMeaning:parts[4],
+     synonym:parts[5]
+
+   })
+
+ })
+
+ return result
+
+}
+
+function showWord(){
+
+ const w=words[index]
+
+ document.getElementById("word").textContent=w.word
+ document.getElementById("meaning").textContent=w.meaning
+ document.getElementById("example").textContent=w.example
+ document.getElementById("exampleMeaning").textContent=w.exampleMeaning
+ document.getElementById("synonym").textContent=w.synonym
+
+ const img=document.getElementById("image")
+
+ if(w.image && w.image.trim()!==""){
+
+   img.src=w.image
+   img.classList.remove("hidden")
+
+ }else{
+
+   img.removeAttribute("src")
+   img.classList.add("hidden")
+
+ }
+
+ document.querySelector("details").open=false
+
+}
+
+function nextWord(){
+
+ index++
+
+ if(index>=words.length){
+   index=0
+ }
+
+ showWord()
+
+}
+
+document.getElementById("next").onclick=nextWord
+
+document.getElementById("know").onclick=()=>{
+
+ total++
+ correct++
+
+ updateStats()
+
+ nextWord()
+
+}
+
+document.getElementById("dontknow").onclick=()=>{
+
+ reviewList.push(words[index])
+
+ saveReview()
+
+ total++
+
+ updateStats()
+
+ nextWord()
+
+}
+
+document.getElementById("review").onclick=()=>{
+
+ if(reviewList.length===0){
+
+   alert("復習単語はありません")
+   return
+
+ }
+
+ words=reviewList
+ index=0
+
+ showWord()
+
+}
+
+document.getElementById("speakWord").onclick=()=>{
+
+ speak(words[index].word)
+
+}
+
+document.getElementById("speakExample").onclick=()=>{
+
+ speak(words[index].example)
+
+}
+
+function speak(text){
+
+ const msg=new SpeechSynthesisUtterance(text)
+
+ msg.lang="en-US"
+ msg.rate=0.9
+
+ speechSynthesis.speak(msg)
+
+}
+
+function updateStats(){
+
+ const rate=total===0?0:Math.round(correct/total*100)
+
+ document.getElementById("total").textContent=total
+ document.getElementById("correct").textContent=correct
+ document.getElementById("rate").textContent=rate+"%"
+
+ localStorage.setItem("stats",JSON.stringify({
+   total,
+   correct
+ }))
+
+}
+
+function loadStats(){
+
+ const data=localStorage.getItem("stats")
+
+ if(data){
+
+   const s=JSON.parse(data)
+
+   total=s.total
+   correct=s.correct
+
+   updateStats()
+
+ }
+
+}
+
+function saveReview(){
+
+ localStorage.setItem("reviewList",JSON.stringify(reviewList))
+
+}
+
+function loadReview(){
+
+ const data=localStorage.getItem("reviewList")
+
+ if(data){
+
+   reviewList=JSON.parse(data)
+
+ }
+
+}
+
+loadCSV()
+
+</script>
+
+</body>
+</html>
