@@ -60,6 +60,12 @@ class="bg-gray-700 text-white px-3 py-1 rounded mb-3">
 <p class="text-gray-500 text-sm">Example Meaning</p>
 <p id="exampleMeaning" class="mb-3"></p>
 
+<p class="text-gray-500 text-sm">YouGlish Link</p>
+<button id="youglish"
+class="bg-red-600 text-white px-4 py-2 rounded mb-4 ml-2">
+▶ YouGlish
+</button>
+
 <p class="text-gray-500 text-sm">Synonym</p>
 <p id="synonym"></p>
 
@@ -221,6 +227,18 @@ function showWord(){
  }
 
  document.querySelector("details").open=false
+
+document.getElementById("youglish").onclick = () => {
+
+ const word = words[index].word
+
+ const url = "https://youglish.com/pronounce/" 
+            + encodeURIComponent(word) 
+            + "/english"
+
+ window.open(url, "_blank")
+
+}
 
 }
 
