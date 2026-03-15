@@ -240,6 +240,34 @@ document.getElementById("youglish").onclick = () => {
 
 }
 
+loadWikiImage(w.word)
+
+}
+
+async function loadWikiImage(word){
+
+ const url =
+ "https://en.wikipedia.org/api/rest_v1/page/summary/" +
+ encodeURIComponent(word)
+
+ try{
+
+   const res = await fetch(url)
+   const data = await res.json()
+
+   if(data.thumbnail){
+
+     const img = document.getElementById("image")
+
+     img.src = data.thumbnail.source
+     img.classList.remove("hidden")
+
+   }
+
+ }catch(e){
+   console.log("image not found")
+ }
+
 }
 
 function nextWord(){
