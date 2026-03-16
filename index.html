@@ -450,7 +450,6 @@ function speak(text){
   const voices = speechSynthesis.getVoices()
 
   const voice =
-    voices.find(v => v.name.includes("Google US English")) ||
     voices.find(v => v.lang === "en-US") ||
     voices.find(v => v.lang === "en-GB")
 
