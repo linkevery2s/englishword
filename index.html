@@ -193,11 +193,10 @@ function parseCSV(text){
    result.push({
 
      word:parts[0].replace(/""/g,'"'),
-     image:parts[1],
-     meaning:parts[2],
-     example:parts[3],
-     exampleMeaning:parts[4],
-     synonym:parts[5]
+     meaning:parts[1],
+     example:parts[2],
+     exampleMeaning:parts[3],
+     synonym:parts[4]
 
    })
 
@@ -221,7 +220,7 @@ function showWord(){
 
  if(w.image && w.image.trim()!==""){
 
-   img.src= "images/" + w.image
+   img.src= "images/" + w.word + ".png"
    img.classList.remove("hidden")
 
  }else{
