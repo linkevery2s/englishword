@@ -447,18 +447,8 @@ function speak(text){
 
   const msg = new SpeechSynthesisUtterance(text)
 
-  const voices = speechSynthesis.getVoices()
-
-  const voice =
-    voices.find(v => v.lang === "en-US") ||
-    voices.find(v => v.lang === "en-GB")
-
-  if(voice){
-    msg.voice = voice
-  }
-
-  msg.rate = 1.0
-  msg.pitch = 1.0
+  msg.lang = "en-US"
+  msg.rate = 0.9
 
   speechSynthesis.speak(msg)
 
