@@ -147,6 +147,41 @@
       </div>
 
     </div>
+    
+    <!-- Listening Training -->
+
+<div class="bg-white p-6 rounded-xl shadow mt-6">
+
+<h2 class="font-bold mb-4">Listening Training</h2>
+
+<div class="overflow-x-auto overflow-y-auto max-h-80 border">
+
+<table class="min-w-full text-sm">
+
+<thead class="bg-gray-200 sticky top-0">
+
+<tr>
+
+<th class="p-2 text-left">Chunk</th>
+<th class="p-2">YouGlish</th>
+<th class="p-2 text-left">Sentence</th>
+<th class="p-2">Audio</th>
+
+</tr>
+
+</thead>
+
+<tbody id="listeningTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+    
+    
 
   </div>
 
@@ -172,8 +207,78 @@
       loadReview()
 
       showWord()
+      
+      loadListeningCSV()
 
     }
+    
+    async function loadListeningCSV(){
+
+const res = await fetch("listening.csv")
+const text = await res.text()
+
+const lines = text.trim().split("\n")
+
+lines.shift()
+
+const table = document.getElementById("listeningTable")
+
+lines.forEach(line => {
+
+const parts = line.split(",")
+
+const chunk = parts[0]
+const sentence = parts[1]
+
+const row = document.createElement("tr")
+
+row.className="border-t"
+
+row.innerHTML = `
+
+<td class="p-2 whitespace-nowrap">${chunk}</td>
+
+<td class="p-2 text-center">
+<button class="bg-red-500 text-white px-2 py-1 rounded">
+▶
+</button>
+</td>
+
+<td class="p-2 whitespace-nowrap">${sentence}</td>
+
+<td class="p-2 text-center">
+<button class="bg-gray-700 text-white px-2 py-1 rounded">
+🔊
+</button>
+</td>
+
+`
+
+table.appendChild(row)
+
+const buttons = row.querySelectorAll("button")
+
+buttons[0].onclick = () => {
+
+const url =
+"https://youglish.com/pronounce/" +
+encodeURIComponent(chunk) +
+"/english"
+
+window.open(url,"_blank")
+
+}
+
+buttons[1].onclick = () => {
+
+speak(sentence)
+
+}
+
+})
+
+}
+    
 
     function shuffleArray(array) {
 
