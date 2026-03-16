@@ -441,16 +441,29 @@ speak(sentence)
 
     }
 
-    function speak(text) {
+function speak(text){
 
-      const msg = new SpeechSynthesisUtterance(text)
+  speechSynthesis.cancel()
 
-      msg.lang = "en-US"
-      msg.rate = 0.9
+  const msg = new SpeechSynthesisUtterance(text)
 
-      speechSynthesis.speak(msg)
+  const voices = speechSynthesis.getVoices()
 
-    }
+  const voice =
+    voices.find(v => v.name.includes("Google US English")) ||
+    voices.find(v => v.lang === "en-US") ||
+    voices.find(v => v.lang === "en-GB")
+
+  if(voice){
+    msg.voice = voice
+  }
+
+  msg.rate = 1.25
+  msg.pitch = 0.95
+
+  speechSynthesis.speak(msg)
+
+}
 
     function updateStats() {
 
