@@ -225,11 +225,9 @@ const table = document.getElementById("listeningTable")
 
 lines.forEach(line => {
 
-const parts = line.split(",")
-
-const chunk = parts[0]
-const sentence = parts[1]
-
+const commaIndex = line.indexOf(",")
+const chunk = line.slice(0, commaIndex)
+const sentence = line.slice(commaIndex + 1)
 const row = document.createElement("tr")
 
 row.className="border-t"
