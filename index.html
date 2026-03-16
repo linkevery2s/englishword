@@ -1,395 +1,416 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html lang="ja">
-
-<head>
-
-<meta charset="UTF-8">
 <title>English Word Trainer</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# article: http://ogp.me/ns/article#">
+  <meta charset="UTF-8" name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta property="og:title" content="English Word Trainer" />
+  <meta property="og:url" content="https://linkevery2s.github.io/englishword/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://linkevery2s.github.io/englishword/ogp.jpg" />
+  <meta name="description" content="Let's practice English Word." />
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="English Word Trainer" />
+  <meta name="twitter:image" content="https://linkevery2s.github.io/englishword/ogp.jpg" />
+  <meta name="author" content="Saito Hitoshi">
+  <meta name="keywords" content="English, word, vocabulary" />
+  <link rel="apple-touch-icon" href="./images/apple-touch-icon.png">
+  <link rel="icon" href="./images/apple-touch-icon.png">
+
+  <link rel="manifest" href="./manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js').then(function () {
+        console.log('Service Worker Registered');
+      });
+    }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 
 <body class="bg-gray-100">
 
-<div class="max-w-3xl mx-auto p-6">
+  <div class="max-w-3xl mx-auto p-6">
 
-<h1 class="text-2xl font-bold mb-6">
-English Word Trainer
-</h1>
+    <h1 class="text-2xl font-bold mb-6">
+      English Word Trainer
+    </h1>
 
-<!-- 問題カード -->
+    <!-- 問題カード -->
 
-<div class="bg-white p-6 rounded-xl shadow">
+    <div class="bg-white p-6 rounded-xl shadow">
 
-<h2 class="text-sm text-gray-500 mb-1">Word</h2>
+      <h2 class="text-sm text-gray-500 mb-1">Word</h2>
 
-<p id="word" class="text-3xl font-bold mb-4"></p>
+      <p id="word" class="text-3xl font-bold mb-4"></p>
 
-<button id="speakWord"
-class="bg-gray-800 text-white px-4 py-2 rounded mb-4">
-🔊 単語音声
-</button>
+      <button id="speakWord" class="bg-gray-800 text-white px-4 py-2 rounded mb-4">
+        🔊 単語音声
+      </button>
 
-</div>
+    </div>
 
-<!-- 答え -->
+    <!-- 答え -->
 
-<details class="bg-white p-6 rounded-xl shadow mt-4">
+    <details class="bg-white p-6 rounded-xl shadow mt-4">
 
-<summary class="cursor-pointer text-blue-600 text-lg">
-答えを見る
-</summary>
+      <summary class="cursor-pointer text-blue-600 text-lg">
+        答えを見る
+      </summary>
 
-<div class="mt-4">
+      <div class="mt-4">
 
-<p class="text-gray-500 text-sm">Meaning</p>
-<p id="meaning" class="text-xl mb-4"></p>
+        <p class="text-gray-500 text-sm">Meaning</p>
+        <p id="meaning" class="text-xl mb-4"></p>
 
-<img id="image"
-class="rounded-lg max-h-72 mb-4 object-contain hidden">
+        <img id="image" class="rounded-lg max-h-72 mb-2 object-contain hidden">
 
-<button id="googleImage"
-class="bg-blue-600 text-white px-3 py-1 rounded mt-2 mb-3">
-🖼 Google Images
-</button>
+        <button id="googleImage" class="bg-blue-600 text-white px-3 py-1 rounded mb-5">
+          🖼 Google Images
+        </button>
 
-<p class="text-gray-500 text-sm">Example</p>
-<p id="example" class="mb-2"></p>
+        <p class="text-gray-500 text-sm">Example</p>
+        <p id="example" class="mb-2"></p>
 
-<button id="speakExample"
-class="bg-gray-700 text-white px-3 py-1 rounded mb-3">
-🔊 例文音声
-</button>
+        <button id="speakExample" class="bg-gray-700 text-white px-3 py-1 rounded mb-5">
+          🔊 例文音声
+        </button>
 
-<p class="text-gray-500 text-sm">Example Meaning</p>
-<p id="exampleMeaning" class="mb-3"></p>
+        <p class="text-gray-500 text-sm">Example Meaning</p>
+        <p id="exampleMeaning" class="mb-5"></p>
 
-<p class="text-gray-500 text-sm">YouGlish Link</p>
-<button id="youglish"
-class="bg-red-600 text-white px-4 py-2 rounded mt-2 mb-4 ml-2">
-▶ YouGlish
-</button>
+        <p class="text-gray-500 text-sm">YouGlish Link</p>
+        <button id="youglish" class="bg-red-600 text-white px-4 py-2 rounded mt-2 mb-5 ml-2">
+          ▶ YouGlish
+        </button>
 
-<p class="text-gray-500 text-sm">Synonym</p>
-<p id="synonym"></p>
+        <p class="text-gray-500 text-sm">Synonym</p>
+        <p id="synonym"></p>
 
-</div>
+      </div>
 
-</details>
+    </details>
 
-<!-- 操作 -->
+    <!-- 操作 -->
 
-<div class="flex gap-4 mt-6">
+    <div class="flex gap-4 mt-6">
 
-<button id="know"
-class="flex-1 bg-green-500 text-white p-3 rounded-lg">
-覚えた
-</button>
+      <button id="know" class="flex-1 bg-green-500 text-white p-3 rounded-lg">
+        覚えた
+      </button>
 
-<button id="dontknow"
-class="flex-1 bg-red-500 text-white p-3 rounded-lg">
-まだ
-</button>
+      <button id="dontknow" class="flex-1 bg-red-500 text-white p-3 rounded-lg">
+        まだ
+      </button>
 
-</div>
+    </div>
 
-<div class="flex gap-4 mt-3">
+    <div class="flex gap-4 mt-3">
 
-<button id="next"
-class="flex-1 bg-blue-600 text-white p-3 rounded-lg">
-次の単語
-</button>
+      <button id="next" class="flex-1 bg-blue-600 text-white p-3 rounded-lg">
+        次の単語
+      </button>
 
-<button id="review"
-class="flex-1 bg-purple-600 text-white p-3 rounded-lg">
-復習モード
-</button>
+      <button id="review" class="flex-1 bg-purple-600 text-white p-3 rounded-lg">
+        復習モード
+      </button>
 
-</div>
+    </div>
 
-<!-- 学習状況 -->
+    <!-- 学習状況 -->
 
-<div class="bg-white p-6 rounded-xl shadow mt-6">
+    <div class="bg-white p-6 rounded-xl shadow mt-6">
 
-<h2 class="font-bold mb-3">学習状況</h2>
+      <h2 class="font-bold mb-3">学習状況</h2>
 
-<div class="grid grid-cols-3 text-center">
+      <div class="grid grid-cols-3 text-center">
 
-<div>
-<p class="text-gray-500 text-sm">回答数</p>
-<p id="total" class="text-2xl font-bold">0</p>
-</div>
+        <div>
+          <p class="text-gray-500 text-sm">回答数</p>
+          <p id="total" class="text-2xl font-bold">0</p>
+        </div>
 
-<div>
-<p class="text-gray-500 text-sm">正答数</p>
-<p id="correct" class="text-2xl font-bold">0</p>
-</div>
+        <div>
+          <p class="text-gray-500 text-sm">正答数</p>
+          <p id="correct" class="text-2xl font-bold">0</p>
+        </div>
 
-<div>
-<p class="text-gray-500 text-sm">正答率</p>
-<p id="rate" class="text-2xl font-bold">0%</p>
-</div>
+        <div>
+          <p class="text-gray-500 text-sm">正答率</p>
+          <p id="rate" class="text-2xl font-bold">0%</p>
+        </div>
 
-</div>
+      </div>
 
-</div>
+    </div>
 
-</div>
+  </div>
 
-<script>
+  <script>
 
-let words=[]
-let reviewList=[]
-let index=0
+    let words = []
+    let reviewList = []
+    let index = 0
 
-let total=0
-let correct=0
+    let total = 0
+    let correct = 0
 
-async function loadCSV(){
+    async function loadCSV() {
 
- const res=await fetch("data.csv")
- const text=await res.text()
+      const res = await fetch("data.csv")
+      const text = await res.text()
 
- words=parseCSV(text)
+      words = parseCSV(text)
 
-shuffleArray(words)   // ←追加
+      shuffleArray(words)   // ←追加
 
- loadStats()
- loadReview()
+      loadStats()
+      loadReview()
 
- showWord()
+      showWord()
 
-}
+    }
 
-function shuffleArray(array){
+    function shuffleArray(array) {
 
- for(let i = array.length - 1; i > 0; i--){
+      for (let i = array.length - 1; i > 0; i--) {
 
-   const j = Math.floor(Math.random() * (i + 1))
+        const j = Math.floor(Math.random() * (i + 1))
 
-   const temp = array[i]
-   array[i] = array[j]
-   array[j] = temp
+        const temp = array[i]
+        array[i] = array[j]
+        array[j] = temp
 
- }
+      }
 
-}
+    }
 
 
-function parseCSV(text){
+    function parseCSV(text) {
 
- const lines=text.trim().split("\n")
- const result=[]
+      const lines = text.trim().split("\n")
+      const result = []
 
- lines.shift()
+      lines.shift()
 
- lines.forEach(line=>{
+      lines.forEach(line => {
 
-   line=line.replace(/^"|"$/g,"")
+        line = line.replace(/^"|"$/g, "")
 
-   const parts=line.split('","')
+        const parts = line.split('","')
 
-   result.push({
+        result.push({
 
-     word:parts[0].replace(/""/g,'"'),
-     meaning:parts[1],
-     example:parts[2],
-     exampleMeaning:parts[3],
-     synonym:parts[4]
+          word: parts[0].replace(/""/g, '"'),
+          meaning: parts[1],
+          example: parts[2],
+          exampleMeaning: parts[3],
+          synonym: parts[4]
 
-   })
+        })
 
- })
+      })
 
- return result
+      return result
 
-}
+    }
 
-function showWord(){
+    function showWord() {
 
- const w=words[index]
+      const w = words[index]
 
- document.getElementById("word").textContent=w.word
- document.getElementById("meaning").textContent=w.meaning
- document.getElementById("example").textContent=w.example
- document.getElementById("exampleMeaning").textContent=w.exampleMeaning
- document.getElementById("synonym").textContent=w.synonym
+      document.getElementById("word").textContent = w.word
+      document.getElementById("meaning").textContent = w.meaning
+      document.getElementById("example").textContent = w.example
+      document.getElementById("exampleMeaning").textContent = w.exampleMeaning
+      document.getElementById("synonym").textContent = w.synonym
 
- const img=document.getElementById("image")
+      const img = document.getElementById("image")
 
- if(w.image && w.image.trim()!==""){
+      img.src = "images/" + w.word + ".png"
 
-   img.src= "images/" + w.word + ".png"
-   img.classList.remove("hidden")
+      img.onerror = () => {
+        img.removeAttribute("src")
+        img.classList.add("hidden")
+      }
 
- }else{
+      img.classList.remove("hidden")
 
-   img.removeAttribute("src")
-   img.classList.add("hidden")
+      document.querySelector("details").open = false
 
- }
+      document.getElementById("youglish").onclick = () => {
 
- document.querySelector("details").open=false
+        const word = words[index].word
 
-document.getElementById("youglish").onclick = () => {
+        const url = "https://youglish.com/pronounce/"
+          + encodeURIComponent(word)
+          + "/english"
 
- const word = words[index].word
+        window.open(url, "_blank")
 
- const url = "https://youglish.com/pronounce/" 
-            + encodeURIComponent(word) 
-            + "/english"
+      }
 
- window.open(url, "_blank")
+      document.getElementById("googleImage").onclick = () => {
 
-}
+        const word = words[index].word
 
-document.getElementById("googleImage").onclick = () => {
+        const url =
+          "https://www.google.com/search?tbm=isch&q=" +
+          encodeURIComponent(word)
 
- const word = words[index].word
+        window.open(url, "_blank")
 
- const url =
- "https://www.google.com/search?tbm=isch&q=" +
- encodeURIComponent(word)
+      }
 
- window.open(url,"_blank")
+    }
 
-}
 
-}
+    function nextWord() {
 
+      index++
 
-function nextWord(){
+      if (index >= words.length) {
+        index = 0
+      }
 
- index++
+      showWord()
 
- if(index>=words.length){
-   index=0
- }
+    }
 
- showWord()
+    document.getElementById("next").onclick = nextWord
 
-}
+    document.getElementById("know").onclick = () => {
 
-document.getElementById("next").onclick=nextWord
+      total++
+      correct++
 
-document.getElementById("know").onclick=()=>{
+      updateStats()
 
- total++
- correct++
+      nextWord()
 
- updateStats()
+    }
 
- nextWord()
+    document.getElementById("dontknow").onclick = () => {
 
-}
+      reviewList.push(words[index])
 
-document.getElementById("dontknow").onclick=()=>{
+      saveReview()
 
- reviewList.push(words[index])
+      total++
 
- saveReview()
+      updateStats()
 
- total++
+      nextWord()
 
- updateStats()
+    }
 
- nextWord()
+    document.getElementById("review").onclick = () => {
 
-}
+      if (reviewList.length === 0) {
 
-document.getElementById("review").onclick=()=>{
+        alert("復習単語はありません")
+        return
 
- if(reviewList.length===0){
+      }
 
-   alert("復習単語はありません")
-   return
+      words = reviewList
+      index = 0
 
- }
+      showWord()
 
- words=reviewList
- index=0
+    }
 
- showWord()
+    document.getElementById("speakWord").onclick = () => {
 
-}
+      speak(words[index].word)
 
-document.getElementById("speakWord").onclick=()=>{
+    }
 
- speak(words[index].word)
+    document.getElementById("speakExample").onclick = () => {
 
-}
+      speak(words[index].example)
 
-document.getElementById("speakExample").onclick=()=>{
+    }
 
- speak(words[index].example)
+    function speak(text) {
 
-}
+      const msg = new SpeechSynthesisUtterance(text)
 
-function speak(text){
+      msg.lang = "en-US"
+      msg.rate = 0.9
 
- const msg=new SpeechSynthesisUtterance(text)
+      speechSynthesis.speak(msg)
 
- msg.lang="en-US"
- msg.rate=0.9
+    }
 
- speechSynthesis.speak(msg)
+    function updateStats() {
 
-}
+      const rate = total === 0 ? 0 : Math.round(correct / total * 100)
 
-function updateStats(){
+      document.getElementById("total").textContent = total
+      document.getElementById("correct").textContent = correct
+      document.getElementById("rate").textContent = rate + "%"
 
- const rate=total===0?0:Math.round(correct/total*100)
+      localStorage.setItem("stats", JSON.stringify({
+        total,
+        correct
+      }))
 
- document.getElementById("total").textContent=total
- document.getElementById("correct").textContent=correct
- document.getElementById("rate").textContent=rate+"%"
+    }
 
- localStorage.setItem("stats",JSON.stringify({
-   total,
-   correct
- }))
+    function loadStats() {
 
-}
+      const data = localStorage.getItem("stats")
 
-function loadStats(){
+      if (data) {
 
- const data=localStorage.getItem("stats")
+        const s = JSON.parse(data)
 
- if(data){
+        total = s.total
+        correct = s.correct
 
-   const s=JSON.parse(data)
+        updateStats()
 
-   total=s.total
-   correct=s.correct
+      }
 
-   updateStats()
+    }
 
- }
+    function saveReview() {
 
-}
+      localStorage.setItem("reviewList", JSON.stringify(reviewList))
 
-function saveReview(){
+    }
 
- localStorage.setItem("reviewList",JSON.stringify(reviewList))
+    function loadReview() {
 
-}
+      const data = localStorage.getItem("reviewList")
 
-function loadReview(){
+      if (data) {
 
- const data=localStorage.getItem("reviewList")
+        reviewList = JSON.parse(data)
 
- if(data){
+      }
 
-   reviewList=JSON.parse(data)
+    }
 
- }
+    loadCSV()
 
-}
+  </script>
 
-loadCSV()
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MPP84V2NHB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-</script>
+    gtag('config', 'G-MPP84V2NHB');
+  </script>
 
 </body>
+
 </html>
