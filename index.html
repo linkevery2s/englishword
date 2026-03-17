@@ -198,75 +198,8 @@
       loadReview()
 
       showWord()
-      
-      loadListeningCSV()
 
     }
-    
-    async function loadListeningCSV(){
-
-const res = await fetch("listening.csv")
-const text = await res.text()
-
-const lines = text.trim().split("\n")
-
-lines.shift()
-
-const table = document.getElementById("listeningTable")
-
-lines.forEach(line => {
-
-const chunk = line.trim()
-
-const row = document.createElement("tr")
-row.className="border-t"
-
-row.innerHTML = `
-
-<td class="p-2 whitespace-nowrap font-semibold">${chunk}</td>
-
-<td class="p-2 text-center">
-<button class="bg-red-500 text-white px-2 py-1 rounded">
-▶
-</button>
-</td>
-
-<td class="p-2 text-center">
-<button class="bg-blue-600 text-white px-2 py-1 rounded">
-🖼
-</button>
-</td>
-
-`
-
-table.appendChild(row)
-
-const buttons = row.querySelectorAll("button")
-
-// YouGlish
-buttons[0].onclick = () => {
-
-const url =
-"https://youglish.com/pronounce/" +
-encodeURIComponent(chunk) +
-"/english"
-
-window.open(url,"_blank")
-
-}
-
-// Google Images
-buttons[1].onclick = () => {
-
-const url =
-"https://www.google.com/search?tbm=isch&q=" +
-encodeURIComponent(chunk)
-
-window.open(url,"_blank")
-
-}
-
-})
     
 
     function shuffleArray(array) {
