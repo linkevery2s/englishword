@@ -225,16 +225,14 @@ const table = document.getElementById("listeningTable")
 
 lines.forEach(line => {
 
-const commaIndex = line.indexOf(",")
-const chunk = line.slice(0, commaIndex)
-const sentence = line.slice(commaIndex + 1)
-const row = document.createElement("tr")
+const chunk = line.trim()
 
+const row = document.createElement("tr")
 row.className="border-t"
 
 row.innerHTML = `
 
-<td class="p-2 whitespace-nowrap">${chunk}</td>
+<td class="p-2 whitespace-nowrap font-semibold">${chunk}</td>
 
 <td class="p-2 text-center">
 <button class="bg-red-500 text-white px-2 py-1 rounded">
@@ -242,11 +240,9 @@ row.innerHTML = `
 </button>
 </td>
 
-<td class="p-2 whitespace-nowrap">${sentence}</td>
-
 <td class="p-2 text-center">
-<button class="bg-gray-700 text-white px-2 py-1 rounded">
-🔊
+<button class="bg-blue-600 text-white px-2 py-1 rounded">
+🖼
 </button>
 </td>
 
@@ -256,6 +252,7 @@ table.appendChild(row)
 
 const buttons = row.querySelectorAll("button")
 
+// YouGlish
 buttons[0].onclick = () => {
 
 const url =
@@ -267,15 +264,18 @@ window.open(url,"_blank")
 
 }
 
+// Google Images
 buttons[1].onclick = () => {
 
-speak(sentence)
+const url =
+"https://www.google.com/search?tbm=isch&q=" +
+encodeURIComponent(chunk)
+
+window.open(url,"_blank")
 
 }
 
 })
-
-}
     
 
     function shuffleArray(array) {
