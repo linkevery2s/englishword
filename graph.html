@@ -9,129 +9,185 @@
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100">
 
-<!-- header -->
-<header class="bg-blue-600 text-white p-4 text-center text-xl font-bold">
+<header class="bg-blue-600 text-white text-center p-4 text-xl font-bold">
 English Study Dashboard
 </header>
 
-<!-- dashboard -->
 <div class="max-w-6xl mx-auto p-6 grid gap-6 md:grid-cols-2">
 
-<!-- total time -->
-<div class="bg-white rounded-xl shadow p-6 text-center">
-
-<h2 class="text-lg font-bold mb-2">
-Total Study Time
-</h2>
-
-<p id="totalTime" class="text-4xl font-bold text-blue-600">
-0 min
-</p>
-
+<!-- 総時間 -->
+<div class="bg-white p-6 rounded-xl shadow text-center md:col-span-2">
+<h2 class="text-lg font-bold">Total Study Time</h2>
+<p id="totalTime" class="text-3xl font-bold text-blue-600 mt-2"></p>
 </div>
 
-<!-- pie chart -->
-<div class="bg-white rounded-xl shadow p-6">
-
-<h2 class="text-lg font-bold mb-4 text-center">
-Study Ratio
-</h2>
-
+<!-- 円グラフ -->
+<div class="bg-white p-4 rounded-xl shadow">
+<h2 class="font-bold mb-2">学習割合</h2>
 <canvas id="pieChart"></canvas>
-
 </div>
 
-<!-- study list -->
-<div class="bg-white rounded-xl shadow p-6 md:col-span-2">
+<!-- 週グラフ -->
+<div class="bg-white p-4 rounded-xl shadow">
+<h2 class="font-bold mb-2">週ごとの学習時間</h2>
+<canvas id="barChart"></canvas>
+</div>
 
-<h2 class="text-lg font-bold mb-4">
-Study Details
-</h2>
-
-<ul id="studyList" class="space-y-2 text-gray-700"></ul>
-
+<!-- テーブル -->
+<div class="bg-white p-4 rounded-xl shadow md:col-span-2">
+<h2 class="font-bold mb-2">学習履歴</h2>
+<table class="w-full text-sm">
+<thead>
+<tr class="border-b">
+<th>日付</th>
+<th>科目</th>
+<th class="text-right">分</th>
+</tr>
+</thead>
+<tbody id="tableBody"></tbody>
+</table>
 </div>
 
 </div>
 
 <script>
 
+const API_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AY5xjrRa6KZiSrnh9rN_hZVV4JODAFp4pxJfV0MTmvMKwXPLVO0gqNFreUK31xxpXF7_9ojrc_bi3t9WnyVbV_Xbb-oDXvAFnvwewfVN5dl8HjalBVxaJwxcD7e-D2UJDNzAX4o_rb-1I8cdNfUq8F3NvWpZ__DsNxLZYgusOV449QCfqG1lxjZ_3iA1NUMli5-aU4vL7BJK3VgL4v65RE4ZOog48aPVTFC6BlIaYJpJoDmly2TxWx3T4jiRjllXt7aN5xatRi6FH3AilIx9dHTcJGO6dmUuaA&lib=MiePSVr3D_eqAovTNfVeuDDA3Wcg5FMSu"
+
+// ===== 除外 =====
+function isEnglishStudy(subject){
+const exclude = ["シビックテック","論文","数学"]
+return !exclude.includes(subject)
+}
+
+// ===== 正規化 =====
+function normalize(subject){
+const map = {
+"英語":"reading",
+"英会話":"speaking",
+"英作文":"writing",
+"ライティング":"writing",
+"grammer":"grammar",
+"reading":"reading",
+"vocaburary":"vocabulary",
+"listening":"listening",
+"speaking":"speaking"
+}
+return map[subject] || subject
+}
+
+// ===== メイン =====
 async function loadData(){
 
-const res = await fetch("study-data.json")
-const json = await res.json()
+const res = await fetch(API_URL)
+let data = await res.json()
 
-const labels = json.skills.map(s => s.name)
-const values = json.skills.map(s => s.time)
+// フィルタ
+data = data.filter(d => isEnglishStudy(d.subject))
 
-const total = values.reduce((a,b)=>a+b,0)
+// ===== 総時間 =====
+const totalMinutes = data.reduce((sum,d)=>sum+d.minutes,0)
+const hours = Math.floor(totalMinutes / 60)
+const minutes = totalMinutes % 60
 
-document.getElementById("totalTime").innerText = total + " min"
+document.getElementById("totalTime").innerText =
+`${hours}時間${minutes}分`
 
-createPieChart(labels,values)
-createList(labels,values)
+// ===== 円グラフ（降順ソート）=====
+const totals = {}
 
-}
-
-function createPieChart(labels,data){
-
-new Chart(
-document.getElementById("pieChart"),
-{
-type:"pie",
-
-data:{
-labels:labels,
-datasets:[
-{
-data:data,
-backgroundColor:[
-"#3b82f6",
-"#10b981",
-"#f59e0b",
-"#ef4444",
-"#8b5cf6",
-"#14b8a6"
-]
-}
-]
-},
-
-options:{
-responsive:true,
-plugins:{
-legend:{
-position:"bottom"
-}
-}
-}
-
+data.forEach(d=>{
+const key = normalize(d.subject)
+totals[key] = (totals[key] || 0) + d.minutes
 })
 
+const sorted = Object.entries(totals)
+.sort((a,b)=>b[1]-a[1])
+
+const pieLabels = sorted.map(i=>i[0])
+const pieData = sorted.map(i=>i[1])
+
+new Chart(document.getElementById("pieChart"),{
+type:"pie",
+data:{
+labels:pieLabels,
+datasets:[{data:pieData}]
+},
+options:{
+plugins:{
+legend:{position:"bottom"},
+datalabels:{
+color:"#fff",
+font:{weight:"bold"},
+formatter:(value,context)=>{
+const data = context.chart.data.datasets[0].data
+const total = data.reduce((a,b)=>a+b,0)
+const percent = Math.round(value/total*100)
+return percent + "%"
+}
+}
+}
+},
+plugins:[ChartDataLabels]
+})
+
+// ===== 週グラフ =====
+const weekly = {}
+
+data.forEach(d=>{
+const date = new Date(d.date)
+
+const month = date.getMonth()+1
+const weekNum = Math.ceil(date.getDate()/7)
+
+const key = `${date.getFullYear()}-${month}-${weekNum}`
+const label = `${month}月 第${weekNum}週`
+
+if(!weekly[key]){
+weekly[key] = {label:label,total:0}
 }
 
-function createList(labels,data){
+weekly[key].total += d.minutes
+})
 
-const ul = document.getElementById("studyList")
+// 日付順ソート
+const sortedWeeks = Object.entries(weekly)
+.sort((a,b)=> new Date(a[0]) - new Date(b[0]))
 
-labels.forEach((label,i)=>{
+const barLabels = sortedWeeks.map(w=>w[1].label)
+const barData = sortedWeeks.map(w=>w[1].total)
 
-const li = document.createElement("li")
+new Chart(document.getElementById("barChart"),{
+type:"bar",
+data:{
+labels:barLabels,
+datasets:[{
+label:"minutes",
+data:barData
+}]
+}
+})
 
-li.className="flex justify-between border-b pb-1"
+// ===== テーブル =====
+const tbody = document.getElementById("tableBody")
 
-li.innerHTML = `
-<span>${label}</span>
-<span>${data[i]} min</span>
+data.slice().reverse().forEach(d=>{
+const tr = document.createElement("tr")
+tr.className="border-b"
+
+tr.innerHTML = `
+<td>${d.date.split("T")[0]}</td>
+<td>${d.subject}</td>
+<td class="text-right">${d.minutes}</td>
 `
 
-ul.appendChild(li)
-
+tbody.appendChild(tr)
 })
 
 }
