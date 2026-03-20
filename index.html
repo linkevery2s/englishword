@@ -648,16 +648,26 @@
       const barLabels = sortedWeeks.map(w => w[1].label)
       const barData = sortedWeeks.map(w => w[1].total)
 
-      new Chart(document.getElementById("barChart"), {
-        type: "bar",
-        data: {
-          labels: barLabels,
-          datasets: [{
-            label: "minutes",
-            data: barData
-          }]
-        }
-      })
+new Chart(document.getElementById("barChart"),{
+type:"bar",
+
+data:{
+labels:barLabels,
+datasets:[{
+label:"minutes",
+data:barData
+}]
+},
+
+options:{
+plugins:{
+legend:{
+display:false  // ★ これを追加
+}
+}
+}
+
+})
 
       // ===== テーブル =====
       const tbody = document.getElementById("tableBody")
