@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IPA Pronunciation Trainer</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+margin:20px;
+line-height:1.6;
+background:#fafafa;
+}
+
+h1,h2,h3{
+margin-top:32px;
+}
+
+.section{
+margin-bottom:40px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+gap:12px;
+margin-top:15px;
+}
+
+.card{
+background:white;
+padding:16px;
+border-radius:16px;
+text-align:center;
+cursor:pointer;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+transition:.2s;
+}
+
+.card:hover{
+transform:translateY(-3px);
+}
+
+.symbol{
+font-size:28px;
+font-weight:bold;
+}
+
+.word{
+margin-top:8px;
+font-size:15px;
+}
+
+.sub{
+color:#666;
+font-size:13px;
+}
+
+.compare{
+background:white;
+padding:18px;
+border-radius:16px;
+margin:14px 0;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+button{
+padding:8px 14px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+}
+
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.55);
+justify-content:center;
+align-items:center;
+}
+
+.modal-content{
+background:white;
+width:92%;
+max-width:520px;
+padding:28px;
+border-radius:20px;
+text-align:center;
+}
+
+.mouth{
+margin:20px auto;
+width:220px;
+}
+
+.close{
+background:#ddd;
+}
+
+a{
+text-decoration:none;
+}
+</style>
+</head>
+<body>
+
+<h1>英語発音記号トレーニング</h1>
+
+<div id="content"></div>
+
+
+<div class="modal" id="modal">
+<div class="modal-content">
+
+<h1 id="ipa"></h1>
+<h3 id="word"></h3>
+
+<div class="mouth" id="mouthArt"></div>
+
+<p id="tip"></p>
+
+<button onclick="playSound()">
+🔊 発音
+</button>
+
+<a id="yg" target="_blank">
+<button>
+▶ YouGlish
+</button>
+</a>
+
+<br><br>
+
+<button class="close"
+onclick="closeModal()">
+閉じる
+</button>
+
+</div>
+</div>
+
+
+
+<script>
+
+const sections=[
+
+{
+title:"母音 (Vowels)",
+items:[
+["/iː/","see","seat"],
+["/ɪ/","sit","ship"],
+["/e/","bed","ten"],
+["/æ/","cat","map"],
+["/ɑː/","car","start"],
+["/ʌ/","cup","luck"],
+["/ɒ/","hot","box"],
+["/ɔː/","law","talk"],
+["/ʊ/","book","good"],
+["/uː/","food","blue"],
+["/ə/","about","teacher"],
+["/ɜː/","bird","work"]
+]
+},
+
+{
+title:"二重母音 (Diphthongs)",
+items:[
+["/eɪ/","day","make"],
+["/aɪ/","my","time"],
+["/ɔɪ/","boy","choice"],
+["/aʊ/","now","house"],
+["/oʊ/","go","phone"],
+["/ɪə/","near","here"],
+["/eə/","hair","care"],
+["/ʊə/","tour","pure"]
+]
+},
+
+{
+title:"子音 破裂音",
+items:[
+["/p/","pen"],
+["/b/","book"],
+["/t/","time"],
+["/d/","dog"],
+["/k/","cat"],
+["/g/","go"]
+]
+},
+
+{
+title:"摩擦音",
+items:[
+["/f/","fan"],
+["/v/","very"],
+["/θ/","think"],
+["/ð/","this"],
+["/s/","see"],
+["/z/","zoo"],
+["/ʃ/","she"],
+["/ʒ/","vision"],
+["/h/","hat"]
+]
+},
+
+{
+title:"破擦音",
+items:[
+["/tʃ/","chair"],
+["/dʒ/","job"]
+]
+},
+
+{
+title:"鼻音",
+items:[
+["/m/","man"],
+["/n/","no"],
+["/ŋ/","sing"]
+]
+},
+
+{
+title:"その他",
+items:[
+["/l/","light"],
+["/r/","right"],
+["/j/","yes"],
+["/w/","we"]
+]
+}
+
+];
+
+const mouthTips={
+"/θ/":"舌先を歯に軽く当て息を出す",
+"/ð/":"舌を歯に当て濁らせる",
+"/r/":"舌を巻いてR音",
+"/l/":"舌先を上歯裏につける",
+"/æ/":"口を大きく開く",
+"/ə/":"弱く曖昧なSchwa",
+"default":"口の形を意識して発音"
+};
+
+let currentWord="";
+
+function mouthSvg(symbol){
+
+if(symbol==="/θ/" || symbol==="/ð/"){
+return `
+<svg viewBox="0 0 200 120">
+<ellipse cx="100" cy="60" rx="55" ry="25"
+fill="none" stroke="black" stroke-width="4"/>
+<line x1="100" y1="60"
+x2="140" y2="60"
+stroke="black"
+stroke-width="5"/>
+</svg>`;
+}
+
+if(symbol==="/r/"){
+return `
+<svg viewBox="0 0 200 120">
+<ellipse cx="100" cy="60" rx="55" ry="28"
+fill="none" stroke="black" stroke-width="4"/>
+<path d="M90 60 q20 -25 35 -5"
+stroke="black"
+fill="none"
+stroke-width="4"/>
+</svg>`;
+}
+
+return `
+<svg viewBox="0 0 200 120">
+<ellipse cx="100" cy="60"
+rx="55"
+ry="30"
+fill="none"
+stroke="black"
+stroke-width="4"/>
+</svg>`;
+}
+
+
+function render(){
+
+let html="";
+
+sections.forEach(sec=>{
+
+html+=`
+<div class='section'>
+<h2>${sec.title}</h2>
+<div class='grid'>
+`;
+
+sec.items.forEach(item=>{
+
+html+=`
+<div class='card'
+onclick='openModal(
+"${item[0]}",
+"${item[1]}"
+)'>
+<div class='symbol'>
+${item[0]}
+</div>
+
+<div class='word'>
+${item[1]}
+</div>
+
+<div class='sub'>
+${item[2]||""}
+</div>
+</div>
+`;
+});
+
+html+=`</div></div>`;
+});
+
+html+=`
+
+<h2>日本人が苦手でTOEIC重要な音</h2>
+
+<div class="compare">
+<h3>/r/ と /l/</h3>
+right / light<br>
+glass / grass
+</div>
+
+<div class="compare">
+<h3>/b/ と /v/</h3>
+berry / very
+</div>
+
+<div class="compare">
+<h3>/θ/ と /ð/</h3>
+think / thank<br>
+this / those
+</div>
+
+<div class="compare">
+<h3>Schwa /ə/</h3>
+about (ə-bout)<br>
+support (sə-port)<br>
+banana (bə-na-na)
+</div>
+
+<h2>TOEICでよく崩れる音</h2>
+
+<div class="compare">
+interview /ˈɪn.tər.vjuː/
+</div>
+
+<div class="compare">
+available /əˈveɪ.lə.bəl/
+</div>
+
+<div class="compare">
+responsible /rɪˈspɑːn.sə.bəl/
+</div>
+
+<div class="compare">
+schedule /ˈskedʒ.uːl/
+</div>
+
+`;
+
+document.getElementById("content").innerHTML=html;
+
+}
+
+function openModal(symbol,word){
+
+currentWord=word;
+
+document.getElementById("ipa").textContent=symbol;
+document.getElementById("word").textContent=word;
+
+document.getElementById("tip").textContent=
+mouthTips[symbol]||mouthTips.default;
+
+document.getElementById("mouthArt").innerHTML=
+mouthSvg(symbol);
+
+document.getElementById("yg").href=
+`https://youglish.com/pronounce/${word}/english`;
+
+document.getElementById("modal").style.display="flex";
+}
+
+function closeModal(){
+document.getElementById("modal").style.display="none";
+}
+
+function playSound(){
+const u=
+new SpeechSynthesisUtterance(currentWord);
+u.lang="en-US";
+speechSynthesis.speak(u);
+}
+
+render();
+
+</script>
+
+</body>
+</html>
